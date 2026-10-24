@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kitchen Whiteboard</title>
+<style>
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    font-family: "Segoe Print", "Bradley Hand", "Comic Sans MS", cursive, sans-serif;
+    background-color: #7a6a55;
+    color: #222;
+    min-height: 100vh;
+    padding: 14px;
+  }
+  .board {
+    background: #fdfdf8;
+    border: 10px solid #3a3a3a;
+    border-radius: 10px;
+    box-shadow: 0 10px 30px rgba(0,0,0,.45);
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 18px 18px 26px;
+  }
+  h1 {
+    text-align: center;
+    margin: 0 0 4px;
+    font-size: 2rem;
+    letter-spacing: 1px;
+    color: #333;
+  }
+  .sub {
+    text-align: center;
+    font-family: -apple-system, "Segoe UI", Roboto, sans-serif;
+    color: #888;
+    font-size: .85rem;
+    margin-bottom: 14px;
+  }
+  .toolbar { text-align: center; margin-bottom: 18px; }
+  button.shop-btn {
+    font-family: -apple-system, "Segoe UI", Roboto, sans-serif;
+    font-size: 1.3rem;
+    font-weight: 700;
+    padding: 14px 44px;
+    min-height: 56px;
+    border: none;
+    border-radius: 10px;
+    background: #2e8b3a;
+    color: #fff;
+    cursor: pointer;
+    box-shadow: 0 3px 8px rgba(0,0,0,.25);
+  }
+  button.shop-btn:active { background: #226b2c; }
+  .columns {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 0;
+  }
+  .col { padding: 0 16px; }
+  .col + .col { border-left: 2px solid #d8d8ce; }
+  .col h2 {
+    margin: 0 0 10px;
+    font-size: 1.5rem;
+    text-decoration: underline;
+    text-underline-offset: 5px;
+  }
+  .col.groceries h2 { color: #2e8b3a; }
+  .col.misc h2 { color: #333; }
+  .col.chores h2 { color: #2456c8; }
+  ul.items { list-style: none; margin: 0 0 12px; padding: 0; }
+  li.item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 48px;
+    padding: 6px 4px;
+    border-bottom: 1px dashed #e2e2d8;
+    font-size: 1.15rem;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+  li.item .box {
+    flex: 0 0 auto;
+    width: 26px; height: 26px;
+    border: 2.5px solid #555;
+    border-radius: 5px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    line-height: 1;
+    color: #c0392b;
+    background: #fff;
+  }
+  li.item .text { flex: 1 1 auto; word-break: break-word; }
+  li.item .detail { color: #777; font-size: .95rem; }
+  li.item.done .text { text-decoration: line-through; color: #999; }
+  .brandtag {
+    display: inline-block;
+    font-family: -apple-system, "Segoe UI", Roboto, sans-serif;
+    font-size: .75rem;
+    font-weight: 600;
+    color: #2456c8;
+    border: 1.5px solid #2456c8;
+    border-radius: 20px;
+    padding: 1px 8px;
+    margin-left: 6px;
+    vertical-align: middle;
+    white-space: nowrap;
+  }
+  li.item button.iconbtn {
+    flex: 0 0 auto;
+    border: none;
+    background: none;
+    color: #bbb;
+    font-size: 1.3rem;
+    line-height: 1;
+    width: 44px; height: 44px;
+    cursor: pointer;
+    font-family: -apple-system, "Segoe UI", Roboto, sans-serif;
+  }
+  li.item button.iconbtn:active { color: #333; }
+  li.item button.del:active { color: #c0392b; }
+  li.empty {
+    color: #aaa;
+    font-size: 1.05rem;
+    padding: 10px 4px;
+    list-style: none;
+  }
+  form.add { display: flex; gap: 8px; margin-top: 6px; }
+  form.add input {
+    flex: 1 1 auto;
+    min-width: 0;
+    font: inherit;
+    font-size: 1.05rem;
+    padding: 10px;
+    border: 2px solid #ccc;
+    border-radius: 8px;
+    background: #fff;
+  }
+  form.add button {
+    flex: 0 0 auto;
+    font-family: -apple-system, "Segoe UI", Roboto, sans-serif;
+    font-size: 1rem;
+    font-weight: 600;
+    padding: 10px 16px;
+    border: none;
+    border-radius: 8px;
+    background: #3a3a3a;
+    color: #fff;
+    cursor: pointer;
+    min-height: 48px;
+  }
+  form.add button:active { background: #000; }
+  button.clear {
+    margin-top: 12px;
+    font-family: -apple-system, "Segoe UI", Roboto, sans-serif;
+    font-size: .9rem;
+    padding: 10px 14px;
+    min-height: 44px;
+    border: 2px solid #c0392b;
+    color: #c0392b;
+    background: #fff;
+    border-radius: 8px;
+    cursor: pointer;
+  }
+  button.clear[hidden] { display: none; }
+  .err {
+    text-align: center;
+    color: #c0392b;
+    font-family: -apple-system, "Segoe UI", Roboto, sans-serif;
+    font-size: .9rem;
+    min-height: 1.2em;
+    margin-top: 12px;
+  }
+
+  /* ---- Store picker overlay ---- */
+  .overlay {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,.55);
+    display: flex; align-items: center; justify-content: center;
+    padding: 18px;
+    z-index: 10;
+  }
+  .overlay[hidden] { display: none; }
+  .picker {
+    background: #fdfdf8;
+    border-radius: 12px;
+    padding: 22px;
+    max-width: 420px;
+    width: 100%;
+    text-align: center;
+  }
+  .picker h3 { margin: 0 0 14px; font-size: 1.4rem; }
+  .picker button.store {
+    display: block;
+    width: 100%;
+    font-family: -apple-system, "Segoe UI", Roboto, sans-serif;
+    font-size: 1.15rem;
+    font-weight: 600;
+    padding: 14px;
+    min-height: 54px;
+    margin: 8px 0;
+    border: 2px solid #2e8b3a;
+    border-radius: 10px;
+    background: #fff;
+    color: #226b2c;
+    cursor: pointer;
+  }
+  .picker button.store:active { background: #e6f4e8; }
+  .picker button.cancel {
+    font-family: -apple-system, "Segoe UI", Roboto, sans-serif;
+    font-size: 1rem;
+    margin-top: 8px;
+    padding: 10px 22px;
+    min-height: 48px;
+    border: none; border-radius: 8px;
+    background: #eee; color: #555;
+    cursor: pointer;
+  }
+
+  /* ---- Shop view ---- */
+  .shop-head {
+    display: flex; align-items: center; gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 6px;
+  }
+  .shop-head h2 { margin: 0; font-size: 1.5rem; color: #226b2c; flex: 1 1 auto; }
+  button.back {
+    font-family: -apple-system, "Segoe UI", Roboto, sans-serif;
+    font-size: 1rem; font-weight: 600;
+    padding: 12px 18px; min-height: 50px;
+    border: none; border-radius: 9px;
+    background: #3a3a3a; color: #fff;
+    cursor: pointer;
+  }
+  h3.section {
+    margin: 20px 0 4px;
+    font-size: 1.25rem;
+    color: #555;
+    border-bottom: 2px solid #d8d8ce;
+    padding-bottom: 3px;
+  }
+  ul.shop-items { list-style: none; margin: 0; padding: 0; }
+  li.shop-item {
+    padding: 8px 4px 12px;
+    border-bottom: 1px dashed #e2e2d8;
+  }
+  .shop-row {
+    display: flex; align-items: center; gap: 12px;
+    min-height: 56px;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .shop-row .box {
+    flex: 0 0 auto;
+    width: 36px; height: 36px;
+    border: 3px solid #555;
+    border-radius: 7px;
+    display: inline-flex; align-items: center; justify-content: center;
+    font-size: 1.6rem; line-height: 1;
+    color: #c0392b; background: #fff;
+  }
+  .shop-row .text { font-size: 1.3rem; word-break: break-word; }
+  .shop-row .detail { color: #777; font-size: 1.05rem; }
+  li.shop-item.done .shop-row .text { text-decoration: line-through; color: #999; }
+  .brands { display: flex; flex-wrap: wrap; gap: 8px; margin: 2px 0 0 48px; }
+  .brands button.chip {
+    font-family: -apple-system, "Segoe UI", Roboto, sans-serif;
+    font-size: .95rem;
+    padding: 9px 14px;
+    min-height: 44px;
+    border: 2px solid #999;
+    border-radius: 22px;
+    background: #fff;
+    color: #444;
+    cursor: pointer;
+  }
+  .brands button.chip.selected {
+    border-color: #2456c8;
+    background: #2456c8;
+    color: #fff;
+    font-weight: 700;
+  }
+  .shop-empty { color: #aaa; font-size: 1.1rem; padding: 14px 4px; }
+
+  @media (max-width: 760px) {
+    body { padding: 8px; }
+    .board { border-width: 6px; padding: 12px 10px 20px; }
+    .columns { grid-template-columns: 1fr; }
+    .col { padding: 10px 4px 18px; }
+    .col + .col { border-left: none; border-top: 2px solid #d8d8ce; }
+    h1 { font-size: 1.6rem; }
+    .brands { margin-left: 0; }
+  }
+</style>
+</head>
+<body>
+<div class="board">
+  <h1>Kitchen Whiteboard</h1>
+  <div class="sub">One board for the whole family — tap an item to check it off. The ✎ button adds a quantity or note.</div>
+
+  <div id="boardView">
+    <div class="toolbar"><button class="shop-btn" id="shopBtn" type="button">🛒 Shop</button></div>
+    <div class="columns" id="columns"></div>
+  </div>
+
+  <div id="shopView" hidden>
+    <div class="shop-head">
+      <h2 id="shopTitle">Shopping</h2>
+      <button class="back" id="backBtn" type="button">← Back to board</button>
+    </div>
+    <div class="sub" style="text-align:left">Groceries in store order. Tap an item as it goes in the cart, and tap a brand so the right one gets grabbed.</div>
+    <div id="shopList"></div>
+  </div>
+
+  <div class="err" id="err"></div>
+</div>
+
+<div class="overlay" id="storePicker" hidden>
+  <div class="picker">
+    <h3>Where are you shopping?</h3>
+    <div id="storeButtons"></div>
+    <button class="cancel" id="pickerCancel" type="button">Cancel</button>
+  </div>
+</div>
+
+<script>
+'use strict';
+
+var COLUMNS = [
+  { key: 'groceries', title: 'Groceries' },
+  { key: 'misc',      title: 'Misc.' },
+  { key: 'chores',    title: 'Chores' }
+];
+
+var STORES = ['Grocery Outlet', 'WinCo', 'Albertsons', 'Any store'];
+
+/* CLASSIFY-START — grocery section classifier (also exercised by tests).
+   Standard store-flow order; sections checked in priority order so
+   e.g. "Frozen Avocados" lands in Frozen and "Black Pepper" in
+   Sauces & Condiments, not Produce. */
+var SECTIONS = [
+  'Produce',
+  'Bakery',
+  'Meat/Deli',
+  'Dairy & Eggs',
+  'Frozen',
+  'Pantry/Dry Goods',
+  'Sauces & Condiments',
+  'Household/Other'
+];
+
+function hasAny(t, words) {
+  for (var i = 0; i < words.length; i++) {
+    if (t.indexOf(words[i]) !== -1) return true;
+  }
+  return false;
+}
+
+function classifyItem(text) {
+  var t = ' ' + String(text).toLowerCase() + ' ';
+  if (hasAny(t, ['frozen'])) return 'Frozen';
+  if (hasAny(t, ['sauce', 'mayo', 'mayonnaise', 'ketchup', 'mustard', 'black pepper',
+                 'dressing', 'bbq', 'hot sauce', 'soy sauce', 'salsa', 'spice', 'seasoning'])) {
+    return 'Sauces & Condiments';
+  }
+  if (hasAny(t, ['egg', 'milk', 'butter', 'cheese', 'yogurt', 'cream', 'half and half'])) {
+    return 'Dairy & Eggs';
+  }
+  if (hasAny(t, ['chicken', 'beef', 'pork', 'ham ', 'turkey', 'bacon', 'sausage',
+                 'steak', 'ground meat', 'ground beef', 'deli', 'lunch meat', 'salami',
+                 'hot dog', 'fish', 'salmon', 'shrimp', 'tuna steak'])) {
+    return 'Meat/Deli';
+  }
+  if (hasAny(t, ['bread', 'bun', 'tortilla', 'bagel', 'muffin', 'roll', 'cake',
+                 'donut', 'croissant', 'pita', 'english muffin'])) {
+    return 'Bakery';
+  }
+  if (hasAny(t, ['banana', 'tomato', 'apple', 'lettuce', 'onion', 'potato', 'avocado',
+                 'carrot', 'cucumber', 'pepper', 'spinach', 'broccoli', 'garlic',
+                 'lemon', 'lime', 'orange', 'grape', 'strawberr', 'blueberr', 'peach',
+                 'pear', 'melon', 'corn', 'celery', 'zucchini', 'squash', 'mushroom',
+                 'cilantro', 'parsley', 'fruit', 'veggie', 'vegetable', 'salad'])) {
+    return 'Produce';
+  }
+  if (hasAny(t, ['rice', 'pasta', 'spaghetti', 'noodle', 'cereal', 'oat', 'flour',
+                 'sugar', 'coffee', 'tea ', 'beans', 'lentil', 'peanut butter', 'jam',
+                 'jelly', 'honey', 'oil', 'vinegar', 'canned', 'can of', 'soup',
+                 'chips', 'cracker', 'cookie', 'granola', 'nuts', 'popcorn'])) {
+    return 'Pantry/Dry Goods';
+  }
+  return 'Household/Other';
+}
+
+var BRAND_MAP = [
+  { words: ['mayo', 'mayonnaise'], brands: ['Best Foods', 'Kraft'] },
+  { words: ['egg'], brands: ["Eggland's Best"] },
+  { words: ['milk'], brands: ['Alta Dena'] },
+  { words: ['butter'], brands: ["Land O'Lakes"] },
+  { words: ['cheese'], brands: ['Sargento', 'Tillamook'] },
+  { words: ['bread'], brands: ['Wonder', 'Sara Lee'] },
+  { words: ['coffee'], brands: ['Folgers', "Peet's"] }
+];
+
+function brandOptions(text) {
+  var t = String(text).toLowerCase();
+  var extra = [];
+  for (var i = 0; i < BRAND_MAP.length; i++) {
+    if (hasAny(t, BRAND_MAP[i].words)) { extra = BRAND_MAP[i].brands; break; }
+  }
+  return ['Store brand'].concat(extra).concat(['Any brand']);
+}
+/* CLASSIFY-END */
+
+var state = { items: [] };
+var view = 'board';        // 'board' | 'shop'
+var shopStore = 'Any store';
+
+function esc(s) {
+  return String(s).replace(/[&<>"']/g, function (c) {
+    return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+  });
+}
+
+function showErr(msg) {
+  document.getElementById('err').textContent = msg || '';
+}
+
+function api(method, path, body) {
+  var opts = { method: method, headers: { 'Content-Type': 'application/json' } };
+  if (body !== undefined) opts.body = JSON.stringify(body);
+  return fetch(path, opts).then(function (r) {
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    return r.json();
+  });
+}
+
+function load() {
+  return api('GET', '/api/board').then(function (d) {
+    state.items = d.items || [];
+    render();
+    showErr('');
+  }).catch(function () {
+    showErr('Could not reach the board — check your connection.');
+  });
+}
+
+function render() {
+  if (view === 'shop') renderShop();
+  else renderBoard();
+}
+
+/* ================= Board view ================= */
+
+function renderBoard() {
+  document.getElementById('boardView').hidden = false;
+  document.getElementById('shopView').hidden = true;
+  var wrap = document.getElementById('columns');
+  wrap.innerHTML = '';
+  COLUMNS.forEach(function (col) {
+    var items = state.items.filter(function (it) { return it.column === col.key; });
+    var doneCount = items.filter(function (it) { return it.done; }).length;
+
+    var div = document.createElement('div');
+    div.className = 'col ' + col.key;
+
+    var h = document.createElement('h2');
+    h.textContent = col.title;
+    div.appendChild(h);
+
+    var ul = document.createElement('ul');
+    ul.className = 'items';
+    if (!items.length) {
+      var li = document.createElement('li');
+      li.className = 'empty';
+      li.textContent = '(nothing here)';
+      ul.appendChild(li);
+    }
+    items.forEach(function (it) {
+      var li = document.createElement('li');
+      li.className = 'item' + (it.done ? ' done' : '');
+      li.innerHTML =
+        '<span class="box">' + (it.done ? '✓' : '') + '</span>' +
+        '<span class="text">' + esc(it.text) +
+          (it.detail ? ' <span class="detail">(' + esc(it.detail) + ')</span>' : '') +
+          (it.brand ? '<span class="brandtag">' + esc(it.brand) + '</span>' : '') +
+        '</span>' +
+        '<button class="iconbtn edit" type="button" aria-label="Edit quantity or note">✎</button>' +
+        '<button class="iconbtn del" type="button" aria-label="Delete">&times;</button>';
+      li.addEventListener('click', function () { toggle(it); });
+      li.querySelector('.edit').addEventListener('click', function (e) {
+        e.stopPropagation();
+        editDetail(it);
+      });
+      li.querySelector('.del').addEventListener('click', function (e) {
+        e.stopPropagation();
+        remove(it);
+      });
+      ul.appendChild(li);
+    });
+    div.appendChild(ul);
+
+    var form = document.createElement('form');
+    form.className = 'add';
+    form.innerHTML =
+      '<input type="text" maxlength="120" placeholder="Add to ' + esc(col.title) + '…" autocomplete="off">' +
+      '<button type="submit">Add</button>';
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      var input = form.querySelector('input');
+      var text = input.value.trim();
+      if (!text) return;
+      input.value = '';
+      add(col.key, text);
+    });
+    div.appendChild(form);
+
+    var clearBtn = document.createElement('button');
+    clearBtn.className = 'clear';
+    clearBtn.type = 'button';
+    clearBtn.textContent = 'Clear checked (' + doneCount + ')';
+    clearBtn.hidden = doneCount === 0;
+    clearBtn.addEventListener('click', function () { clearChecked(col.key); });
+    div.appendChild(clearBtn);
+
+    wrap.appendChild(div);
+  });
+}
+
+/* ================= Shop view ================= */
+
+function renderShop() {
+  document.getElementById('boardView').hidden = true;
+  document.getElementById('shopView').hidden = false;
+  document.getElementById('shopTitle').textContent = 'Shopping — ' + shopStore;
+  var wrap = document.getElementById('shopList');
+  wrap.innerHTML = '';
+
+  var groceries = state.items.filter(function (it) { return it.column === 'groceries'; });
+  if (!groceries.length) {
+    var empty = document.createElement('div');
+    empty.className = 'shop-empty';
+    empty.textContent = 'Nothing on the grocery list.';
+    wrap.appendChild(empty);
+    return;
+  }
+
+  SECTIONS.forEach(function (section) {
+    var items = groceries.filter(function (it) { return classifyItem(it.text) === section; });
+    if (!items.length) return;
+
+    var h = document.createElement('h3');
+    h.className = 'section';
+    h.textContent = section;
+    wrap.appendChild(h);
+
+    var ul = document.createElement('ul');
+    ul.className = 'shop-items';
+    items.forEach(function (it) {
+      var li = document.createElement('li');
+      li.className = 'shop-item' + (it.done ? ' done' : '');
+      li.innerHTML =
+        '<div class="shop-row">' +
+          '<span class="box">' + (it.done ? '✓' : '') + '</span>' +
+          '<span class="text">' + esc(it.text) +
+            (it.detail ? ' <span class="detail">(' + esc(it.detail) + ')</span>' : '') +
+          '</span>' +
+        '</div>' +
+        '<div class="brands"></div>';
+      li.querySelector('.shop-row').addEventListener('click', function () { toggle(it); });
+
+      var brandsDiv = li.querySelector('.brands');
+      brandOptions(it.text).forEach(function (brand) {
+        var chip = document.createElement('button');
+        chip.type = 'button';
+        chip.className = 'chip' + (it.brand === brand ? ' selected' : '');
+        chip.textContent = brand;
+        chip.addEventListener('click', function () {
+          setBrand(it, it.brand === brand ? '' : brand);
+        });
+        brandsDiv.appendChild(chip);
+      });
+
+      ul.appendChild(li);
+    });
+    wrap.appendChild(ul);
+  });
+}
+
+/* ================= Actions ================= */
+
+function add(column, text) {
+  api('POST', '/api/items', { column: column, text: text }).then(load).catch(function () {
+    showErr('Could not add that — try again.');
+  });
+}
+function toggle(item) {
+  api('PATCH', '/api/items', { id: item.id, done: !item.done }).then(load).catch(function () {
+    showErr('Could not update that — try again.');
+  });
+}
+function remove(item) {
+  api('DELETE', '/api/items?id=' + item.id).then(load).catch(function () {
+    showErr('Could not delete that — try again.');
+  });
+}
+function clearChecked(column) {
+  api('POST', '/api/clear-checked', { column: column }).then(load).catch(function () {
+    showErr('Could not clear — try again.');
+  });
+}
+function editDetail(item) {
+  var value = window.prompt('Quantity or note for "' + item.text + '" (e.g. 2, 18-count, gallon). Leave empty to clear.', item.detail || '');
+  if (value === null) return;
+  api('PATCH', '/api/items', { id: item.id, detail: value.trim() }).then(load).catch(function () {
+    showErr('Could not save that — try again.');
+  });
+}
+function setBrand(item, brand) {
+  api('PATCH', '/api/items', { id: item.id, brand: brand }).then(load).catch(function () {
+    showErr('Could not save that brand — try again.');
+  });
+}
+
+/* ================= Store picker ================= */
+
+var picker = document.getElementById('storePicker');
+var storeButtons = document.getElementById('storeButtons');
+STORES.forEach(function (store) {
+  var b = document.createElement('button');
+  b.type = 'button';
+  b.className = 'store';
+  b.textContent = store;
+  b.addEventListener('click', function () {
+    shopStore = store;
+    picker.hidden = true;
+    view = 'shop';
+    render();
+  });
+  storeButtons.appendChild(b);
+});
+document.getElementById('shopBtn').addEventListener('click', function () { picker.hidden = false; });
+document.getElementById('pickerCancel').addEventListener('click', function () { picker.hidden = true; });
+document.getElementById('backBtn').addEventListener('click', function () { view = 'board'; render(); });
+
+load();
+/* Keep the family in sync: refresh quietly in the background. */
+setInterval(function () { if (!document.hidden) load(); }, 20000);
+document.addEventListener('visibilitychange', function () { if (!document.hidden) load(); });
+</script>
+</body>
+</html>
