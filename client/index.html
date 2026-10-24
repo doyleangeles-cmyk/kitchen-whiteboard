@@ -37,21 +37,6 @@
     font-size: .85rem;
     margin-bottom: 14px;
   }
-  .toolbar { text-align: center; margin-bottom: 18px; }
-  button.shop-btn {
-    font-family: -apple-system, "Segoe UI", Roboto, sans-serif;
-    font-size: 1.3rem;
-    font-weight: 700;
-    padding: 14px 44px;
-    min-height: 56px;
-    border: none;
-    border-radius: 10px;
-    background: #2e8b3a;
-    color: #fff;
-    cursor: pointer;
-    box-shadow: 0 3px 8px rgba(0,0,0,.25);
-  }
-  button.shop-btn:active { background: #226b2c; }
   .columns {
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
@@ -174,6 +159,182 @@
     min-height: 1.2em;
     margin-top: 12px;
   }
+
+  /* ---- View toggle ---- */
+  .viewbar {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-bottom: 16px;
+  }
+  .viewbar button {
+    font-family: -apple-system, "Segoe UI", Roboto, sans-serif;
+    font-size: 1.05rem;
+    font-weight: 600;
+    padding: 12px 22px;
+    min-height: 52px;
+    border: 2.5px solid #3a3a3a;
+    border-radius: 10px;
+    background: #fff;
+    color: #3a3a3a;
+    cursor: pointer;
+  }
+  .viewbar button.active { background: #3a3a3a; color: #fff; }
+  .viewbar button.shop-nav { border-color: #2e8b3a; color: #226b2c; }
+  .viewbar button.shop-nav.active { background: #2e8b3a; color: #fff; }
+
+  /* ---- Freeform board ---- */
+  .freetools {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+  .freetools button.tool {
+    font-family: -apple-system, "Segoe UI", Roboto, sans-serif;
+    font-size: .98rem;
+    font-weight: 600;
+    padding: 10px 16px;
+    min-height: 48px;
+    border: 2px solid #999;
+    border-radius: 9px;
+    background: #fff;
+    color: #444;
+    cursor: pointer;
+  }
+  .freetools button.tool.active { background: #3a3a3a; border-color: #3a3a3a; color: #fff; }
+  .freetools button.tool.add-note { background: #2e8b3a; border-color: #2e8b3a; color: #fff; }
+  .freetools button.tool.danger { border-color: #c0392b; color: #c0392b; }
+  .swatches { display: inline-flex; gap: 8px; align-items: center; }
+  .swatches[hidden] { display: none; }
+  button.swatch {
+    width: 40px; height: 40px;
+    border-radius: 50%;
+    border: 3px solid #ddd;
+    cursor: pointer;
+    padding: 0;
+  }
+  button.swatch.selected { border-color: #333; box-shadow: 0 0 0 2px #fff, 0 0 0 4px #333; }
+  .canvas-wrap {
+    overflow: auto;
+    height: 68vh;
+    min-height: 360px;
+    border: 3px solid #d8d8ce;
+    border-radius: 6px;
+    background: #fff;
+    -webkit-overflow-scrolling: touch;
+  }
+  .canvas {
+    position: relative;
+    width: 1680px;
+    height: 1100px;
+    background-color: #fdfdf8;
+    background-image: radial-gradient(circle, #e3e3d8 1.2px, transparent 1.3px);
+    background-size: 28px 28px;
+  }
+  .canvas svg#ink { position: absolute; left: 0; top: 0; }
+  .canvas svg#ink polyline { fill: none; stroke-linecap: round; stroke-linejoin: round; pointer-events: none; }
+  .canvas.drawmode { touch-action: none; cursor: crosshair; }
+  .canvas.drawmode .note { pointer-events: none; }
+  .canvas.erasemode { cursor: pointer; }
+  .canvas.erasemode svg#ink polyline { pointer-events: stroke; }
+  #notes { position: absolute; left: 0; top: 0; width: 100%; height: 100%; }
+  .note {
+    position: absolute;
+    border: 2px solid rgba(0,0,0,.16);
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0,0,0,.22);
+    padding: 12px 14px;
+    overflow: hidden;
+    cursor: grab;
+    touch-action: none;
+    font-size: 1.05rem;
+    background: #fff6bf;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .note.groceries { background: #e2f4e5; }
+  .note.misc { background: #fff3b0; }
+  .note.chores { background: #dde8ff; }
+  .note .nemoji { display: block; font-size: 2rem; line-height: 1.15; }
+  .note .ntext { word-break: break-word; }
+  .note .ndetail { display: block; color: #777; font-size: .9rem; margin-top: 2px; }
+  .note.done { opacity: .55; }
+  .note.done .ntext { text-decoration: line-through; }
+  .note .ncheck {
+    position: absolute; top: 4px; left: 8px;
+    color: #c0392b; font-size: 1.3rem; font-weight: 700;
+  }
+  .note .nbtns { position: absolute; top: 0; right: 0; display: flex; }
+  .note .nbtns button {
+    width: 38px; height: 38px;
+    border: none; background: rgba(255,255,255,.55);
+    color: #777; font-size: 1.05rem; line-height: 1;
+    cursor: pointer;
+    font-family: -apple-system, "Segoe UI", Roboto, sans-serif;
+  }
+  .note .nbtns button:active { color: #111; }
+  .note .grip {
+    position: absolute; right: 0; bottom: 0;
+    width: 32px; height: 32px;
+    cursor: nwse-resize;
+    touch-action: none;
+    background: linear-gradient(135deg, transparent 52%, rgba(0,0,0,.28) 52%);
+    border-radius: 0 0 6px 0;
+  }
+
+  /* ---- Note editor ---- */
+  .picker.editor { text-align: left; max-width: 460px; }
+  .picker.editor input[type="text"] {
+    display: block;
+    width: 100%;
+    font: inherit;
+    font-size: 1.05rem;
+    padding: 11px;
+    margin: 8px 0;
+    border: 2px solid #ccc;
+    border-radius: 8px;
+    background: #fff;
+  }
+  .picker.editor .lbl {
+    font-family: -apple-system, "Segoe UI", Roboto, sans-serif;
+    font-size: .85rem; font-weight: 600; color: #777;
+    margin-top: 10px;
+  }
+  .emoji-row { display: flex; flex-wrap: wrap; gap: 4px; margin: 4px 0; }
+  .emoji-row button {
+    font-size: 1.45rem;
+    width: 46px; height: 46px;
+    border: 2.5px solid transparent;
+    border-radius: 10px;
+    background: #f4f4ec;
+    cursor: pointer;
+    padding: 0;
+  }
+  .emoji-row button.selected { border-color: #2e8b3a; background: #e6f4e8; }
+  .col-chips { display: flex; gap: 8px; margin: 4px 0; flex-wrap: wrap; }
+  .col-chips button {
+    font-family: -apple-system, "Segoe UI", Roboto, sans-serif;
+    font-size: 1rem; font-weight: 600;
+    padding: 10px 16px; min-height: 46px;
+    border: 2px solid #999; border-radius: 22px;
+    background: #fff; color: #444;
+    cursor: pointer;
+  }
+  .col-chips button.selected { background: #3a3a3a; border-color: #3a3a3a; color: #fff; }
+  .editor-btns { display: flex; gap: 8px; margin-top: 16px; }
+  .editor-btns button {
+    font-family: -apple-system, "Segoe UI", Roboto, sans-serif;
+    font-size: 1rem; font-weight: 600;
+    padding: 12px 16px; min-height: 50px;
+    border: none; border-radius: 9px;
+    cursor: pointer;
+  }
+  .editor-btns .save { background: #2e8b3a; color: #fff; flex: 1 1 auto; }
+  .editor-btns .cancel { background: #eee; color: #555; }
+  .editor-btns .danger { background: #fff; color: #c0392b; border: 2px solid #c0392b; }
+  .editor-btns button[hidden] { display: none; }
 
   /* ---- Store picker overlay ---- */
   .overlay {
@@ -299,11 +460,34 @@
 <body>
 <div class="board">
   <h1>Kitchen Whiteboard</h1>
-  <div class="sub">One board for the whole family — tap an item to check it off. The ✎ button adds a quantity or note.</div>
+  <div class="sub">One board for the whole family. List it, slide it around on the Board, or take it Shopping.</div>
+
+  <div class="viewbar">
+    <button type="button" id="navList">📋 List</button>
+    <button type="button" id="navFree">🖍️ Board</button>
+    <button type="button" id="navShop" class="shop-nav">🛒 Shop</button>
+  </div>
 
   <div id="boardView">
-    <div class="toolbar"><button class="shop-btn" id="shopBtn" type="button">🛒 Shop</button></div>
     <div class="columns" id="columns"></div>
+  </div>
+
+  <div id="freeView" hidden>
+    <div class="freetools">
+      <button type="button" class="tool add-note" id="addNoteBtn">＋ Add note</button>
+      <button type="button" class="tool" id="penBtn">✏️ Pen</button>
+      <span class="swatches" id="swatches" hidden></span>
+      <button type="button" class="tool" id="eraseBtn">🧽 Eraser</button>
+      <button type="button" class="tool" id="undoStrokeBtn">↩ Undo</button>
+      <button type="button" class="tool danger" id="clearStrokesBtn">Clear drawings</button>
+    </div>
+    <div class="canvas-wrap" id="canvasWrap">
+      <div class="canvas" id="canvas">
+        <svg id="ink" width="1680" height="1100" viewBox="0 0 1680 1100" aria-hidden="true"></svg>
+        <div id="notes"></div>
+      </div>
+    </div>
+    <div class="sub" style="margin-top:8px">Drag a note anywhere — drag its corner to stretch it. Tap a note to check it off. Pen draws, eraser rubs out one doodle at a tap.</div>
   </div>
 
   <div id="shopView" hidden>
@@ -323,6 +507,26 @@
     <h3>Where are you shopping?</h3>
     <div id="storeButtons"></div>
     <button class="cancel" id="pickerCancel" type="button">Cancel</button>
+  </div>
+</div>
+
+<div class="overlay" id="editor" hidden>
+  <div class="picker editor">
+    <h3 id="editorTitle">Add a note</h3>
+    <div class="lbl">What goes on the note?</div>
+    <input type="text" id="edText" maxlength="120" placeholder="Milk, call grandma, anything…" autocomplete="off">
+    <div class="lbl">Emoji (optional — a note can be just an emoji)</div>
+    <div class="emoji-row" id="edEmojiRow"></div>
+    <div class="lbl">Which part of the board?</div>
+    <div class="col-chips" id="edCols"></div>
+    <div class="lbl">Quantity or note (optional)</div>
+    <input type="text" id="edDetail" maxlength="60" placeholder="e.g. 2, 18-count, gallon" autocomplete="off">
+    <div class="editor-btns">
+      <button type="button" class="cancel" id="edCancel">Cancel</button>
+      <button type="button" class="danger" id="edDelete" hidden>Delete</button>
+      <button type="button" class="save" id="edSave">Add note</button>
+    </div>
+    <div class="err" id="edErr"></div>
   </div>
 </div>
 
@@ -414,9 +618,25 @@ function brandOptions(text) {
 }
 /* CLASSIFY-END */
 
-var state = { items: [] };
-var view = 'board';        // 'board' | 'shop'
+var state = { items: [], strokes: [] };
+var view = 'board';        // 'board' (list) | 'free' (canvas) | 'shop'
 var shopStore = 'Any store';
+var shopReturn = 'board';  // where Shop's back button returns to
+var busy = false;          // dragging / resizing / drawing / editor open
+
+/* Freeform board geometry — must match the server. */
+var BOARD_W = 1680;
+var BOARD_H = 1100;
+var drawMode = 'off';      // 'off' | 'pen' | 'erase'
+var penColor = '#222222';
+var MARKERS = [
+  { color: '#222222', name: 'Black' },
+  { color: '#2e8b3a', name: 'Green' },
+  { color: '#2456c8', name: 'Blue' },
+  { color: '#c0392b', name: 'Red' }
+];
+var EMOJIS = ['🛒','🥚','🥛','🍌','🍅','🧀','🍞','🥩','🐶','⭐','❤️','🎉',
+              '⚠️','💡','📌','🔥','😀','👍','🏠','🚗','💊','🧻','🌮','🍕'];
 
 function esc(s) {
   return String(s).replace(/[&<>"']/g, function (c) {
@@ -440,6 +660,7 @@ function api(method, path, body) {
 function load() {
   return api('GET', '/api/board').then(function (d) {
     state.items = d.items || [];
+    state.strokes = d.strokes || [];
     render();
     showErr('');
   }).catch(function () {
@@ -448,15 +669,20 @@ function load() {
 }
 
 function render() {
+  document.getElementById('boardView').hidden = view !== 'board';
+  document.getElementById('freeView').hidden = view !== 'free';
+  document.getElementById('shopView').hidden = view !== 'shop';
+  document.getElementById('navList').classList.toggle('active', view === 'board');
+  document.getElementById('navFree').classList.toggle('active', view === 'free');
+  document.getElementById('navShop').classList.toggle('active', view === 'shop');
   if (view === 'shop') renderShop();
+  else if (view === 'free') renderFree();
   else renderBoard();
 }
 
 /* ================= Board view ================= */
 
 function renderBoard() {
-  document.getElementById('boardView').hidden = false;
-  document.getElementById('shopView').hidden = true;
   var wrap = document.getElementById('columns');
   wrap.innerHTML = '';
   COLUMNS.forEach(function (col) {
@@ -532,8 +758,6 @@ function renderBoard() {
 /* ================= Shop view ================= */
 
 function renderShop() {
-  document.getElementById('boardView').hidden = true;
-  document.getElementById('shopView').hidden = false;
   document.getElementById('shopTitle').textContent = 'Shopping — ' + shopStore;
   var wrap = document.getElementById('shopList');
   wrap.innerHTML = '';
@@ -589,6 +813,309 @@ function renderShop() {
   });
 }
 
+/* ================= Freeform board view ================= */
+
+var SVGNS = 'http://www.w3.org/2000/svg';
+var canvasEl = document.getElementById('canvas');
+var inkEl = document.getElementById('ink');
+var notesEl = document.getElementById('notes');
+
+function clampNum(v, min, max) { return Math.max(min, Math.min(max, v)); }
+
+function strokeEl(stroke) {
+  var pl = document.createElementNS(SVGNS, 'polyline');
+  pl.setAttribute('points', stroke.points.map(function (p) { return p[0] + ',' + p[1]; }).join(' '));
+  pl.setAttribute('stroke', stroke.color);
+  pl.setAttribute('stroke-width', '4');
+  pl.dataset.id = stroke.id;
+  if (drawMode === 'erase') {
+    pl.addEventListener('pointerdown', function (e) {
+      e.stopPropagation();
+      deleteStroke(stroke.id);
+    });
+  }
+  return pl;
+}
+
+function renderFree() {
+  canvasEl.classList.toggle('drawmode', drawMode !== 'off');
+  canvasEl.classList.toggle('erasemode', drawMode === 'erase');
+  document.getElementById('penBtn').classList.toggle('active', drawMode === 'pen');
+  document.getElementById('eraseBtn').classList.toggle('active', drawMode === 'erase');
+  document.getElementById('swatches').hidden = drawMode !== 'pen';
+  document.getElementById('undoStrokeBtn').disabled = !state.strokes.length;
+
+  inkEl.innerHTML = '';
+  state.strokes.forEach(function (s) { inkEl.appendChild(strokeEl(s)); });
+
+  notesEl.innerHTML = '';
+  state.items.forEach(function (it) { notesEl.appendChild(noteEl(it)); });
+}
+
+function noteEl(it) {
+  var el = document.createElement('div');
+  el.className = 'note ' + it.column + (it.done ? ' done' : '');
+  el.style.left = it.x + 'px';
+  el.style.top = it.y + 'px';
+  el.style.width = it.w + 'px';
+  el.style.height = it.h + 'px';
+  el.innerHTML =
+    (it.done ? '<span class="ncheck">✓</span>' : '') +
+    (it.emoji ? '<span class="nemoji">' + esc(it.emoji) + '</span>' : '') +
+    '<span class="ntext">' + esc(it.text) + '</span>' +
+    (it.detail ? '<span class="ndetail">' + esc(it.detail) + '</span>' : '') +
+    (it.brand ? '<span class="brandtag">' + esc(it.brand) + '</span>' : '') +
+    '<span class="nbtns">' +
+      '<button type="button" class="nedit" aria-label="Edit note">✎</button>' +
+      '<button type="button" class="ndel" aria-label="Delete note">&times;</button>' +
+    '</span>' +
+    '<span class="grip" aria-hidden="true"></span>';
+
+  el.querySelector('.nedit').addEventListener('pointerdown', function (e) { e.stopPropagation(); });
+  el.querySelector('.nedit').addEventListener('click', function (e) {
+    e.stopPropagation();
+    openEditor(it);
+  });
+  el.querySelector('.ndel').addEventListener('pointerdown', function (e) { e.stopPropagation(); });
+  el.querySelector('.ndel').addEventListener('click', function (e) {
+    e.stopPropagation();
+    remove(it);
+  });
+  var grip = el.querySelector('.grip');
+  grip.addEventListener('pointerdown', function (e) { startResize(e, it, el); });
+
+  el.addEventListener('pointerdown', function (e) { startDrag(e, it, el); });
+  return el;
+}
+
+/* Drag to move; a press that barely moves is a tap → check off.
+   Movement is in client pixels, which matches canvas pixels here
+   (the canvas is rendered 1:1 and only scrolled, never scaled). */
+function startDrag(e, it, el) {
+  if (drawMode !== 'off' || busy) return;
+  e.preventDefault();
+  busy = true;
+  var startX = e.clientX, startY = e.clientY;
+  var origX = it.x, origY = it.y;
+  var moved = false;
+  el.setPointerCapture(e.pointerId);
+  el.onpointermove = function (ev) {
+    var dx = ev.clientX - startX, dy = ev.clientY - startY;
+    if (!moved && Math.abs(dx) + Math.abs(dy) > 6) moved = true;
+    if (moved) {
+      it.x = clampNum(Math.round(origX + dx), -100, BOARD_W - 40);
+      it.y = clampNum(Math.round(origY + dy), 0, BOARD_H - 30);
+      el.style.left = it.x + 'px';
+      el.style.top = it.y + 'px';
+    }
+  };
+  el.onpointerup = el.onpointercancel = function () {
+    el.onpointermove = el.onpointerup = el.onpointercancel = null;
+    busy = false;
+    if (moved) {
+      api('PATCH', '/api/items', { id: it.id, x: it.x, y: it.y }).then(load).catch(function () {
+        showErr('Could not save that move — try again.');
+        load();
+      });
+    } else {
+      toggle(it);
+    }
+  };
+}
+
+/* Corner grip: drag to stretch the note. */
+function startResize(e, it, el) {
+  if (drawMode !== 'off' || busy) return;
+  e.preventDefault();
+  e.stopPropagation();
+  busy = true;
+  var startX = e.clientX, startY = e.clientY;
+  var origW = it.w, origH = it.h;
+  var grip = el.querySelector('.grip');
+  grip.setPointerCapture(e.pointerId);
+  grip.onpointermove = function (ev) {
+    it.w = clampNum(Math.round(origW + ev.clientX - startX), 90, 900);
+    it.h = clampNum(Math.round(origH + ev.clientY - startY), 56, 700);
+    el.style.width = it.w + 'px';
+    el.style.height = it.h + 'px';
+  };
+  grip.onpointerup = grip.onpointercancel = function () {
+    grip.onpointermove = grip.onpointerup = grip.onpointercancel = null;
+    busy = false;
+    api('PATCH', '/api/items', { id: it.id, w: it.w, h: it.h }).then(load).catch(function () {
+      showErr('Could not save that stretch — try again.');
+      load();
+    });
+  };
+}
+
+/* ---- Sketching ---- */
+
+function canvasPoint(e) {
+  var r = canvasEl.getBoundingClientRect();
+  return [Math.round((e.clientX - r.left) * 10) / 10, Math.round((e.clientY - r.top) * 10) / 10];
+}
+
+canvasEl.addEventListener('pointerdown', function (e) {
+  if (drawMode !== 'pen' || busy) return;
+  /* Only start a stroke on empty board, not on a note (notes have
+     pointer-events off in draw mode, so this is just belt & braces). */
+  if (e.target.closest && e.target.closest('.note')) return;
+  e.preventDefault();
+  busy = true;
+  var pts = [canvasPoint(e)];
+  var temp = document.createElementNS(SVGNS, 'polyline');
+  temp.setAttribute('stroke', penColor);
+  temp.setAttribute('stroke-width', '4');
+  temp.setAttribute('points', pts.map(function (p) { return p[0] + ',' + p[1]; }).join(' '));
+  inkEl.appendChild(temp);
+  canvasEl.setPointerCapture(e.pointerId);
+  canvasEl.onpointermove = function (ev) {
+    var p = canvasPoint(ev);
+    var last = pts[pts.length - 1];
+    if (Math.abs(p[0] - last[0]) + Math.abs(p[1] - last[1]) < 3) return;
+    pts.push(p);
+    temp.setAttribute('points', pts.map(function (q) { return q[0] + ',' + q[1]; }).join(' '));
+  };
+  canvasEl.onpointerup = canvasEl.onpointercancel = function () {
+    canvasEl.onpointermove = canvasEl.onpointerup = canvasEl.onpointercancel = null;
+    busy = false;
+    temp.remove();
+    if (pts.length >= 2) {
+      api('POST', '/api/strokes', { color: penColor, points: pts }).then(load).catch(function () {
+        showErr('Could not save that doodle — try again.');
+      });
+    }
+  };
+});
+
+function setDrawMode(mode) {
+  drawMode = drawMode === mode ? 'off' : mode;
+  render();
+}
+document.getElementById('penBtn').addEventListener('click', function () { setDrawMode('pen'); });
+document.getElementById('eraseBtn').addEventListener('click', function () { setDrawMode('erase'); });
+document.getElementById('undoStrokeBtn').addEventListener('click', function () {
+  var last = state.strokes[state.strokes.length - 1];
+  if (last) deleteStroke(last.id);
+});
+document.getElementById('clearStrokesBtn').addEventListener('click', function () {
+  if (!state.strokes.length) return;
+  if (!window.confirm('Rub out ALL the drawings on the board? Notes stay.')) return;
+  api('POST', '/api/clear-strokes', {}).then(load).catch(function () {
+    showErr('Could not clear the drawings — try again.');
+  });
+});
+function deleteStroke(id) {
+  api('DELETE', '/api/strokes?id=' + id).then(load).catch(function () {
+    showErr('Could not erase that — try again.');
+  });
+}
+
+/* Marker color swatches */
+var swatchesEl = document.getElementById('swatches');
+MARKERS.forEach(function (m) {
+  var b = document.createElement('button');
+  b.type = 'button';
+  b.className = 'swatch' + (penColor === m.color ? ' selected' : '');
+  b.style.background = m.color;
+  b.setAttribute('aria-label', m.name + ' marker');
+  b.addEventListener('click', function () {
+    penColor = m.color;
+    swatchesEl.querySelectorAll('.swatch').forEach(function (s) { s.classList.remove('selected'); });
+    b.classList.add('selected');
+  });
+  swatchesEl.appendChild(b);
+});
+
+/* ---- Note editor (add + edit) ---- */
+
+var editorEl = document.getElementById('editor');
+var editingItem = null;   // null = adding a new note
+var edEmoji = '';
+var edColumn = 'groceries';
+
+var edEmojiRow = document.getElementById('edEmojiRow');
+EMOJIS.forEach(function (em) {
+  var b = document.createElement('button');
+  b.type = 'button';
+  b.textContent = em;
+  b.dataset.emoji = em;
+  b.addEventListener('click', function () {
+    edEmoji = edEmoji === em ? '' : em;
+    paintEditorChoices();
+  });
+  edEmojiRow.appendChild(b);
+});
+var edColsEl = document.getElementById('edCols');
+COLUMNS.forEach(function (col) {
+  var b = document.createElement('button');
+  b.type = 'button';
+  b.textContent = col.title;
+  b.dataset.column = col.key;
+  b.addEventListener('click', function () {
+    edColumn = col.key;
+    paintEditorChoices();
+  });
+  edColsEl.appendChild(b);
+});
+function paintEditorChoices() {
+  edEmojiRow.querySelectorAll('button').forEach(function (b) {
+    b.classList.toggle('selected', b.dataset.emoji === edEmoji);
+  });
+  edColsEl.querySelectorAll('button').forEach(function (b) {
+    b.classList.toggle('selected', b.dataset.column === edColumn);
+  });
+}
+
+function openEditor(item) {
+  editingItem = item || null;
+  edEmoji = item ? item.emoji : '';
+  edColumn = item ? item.column : 'groceries';
+  document.getElementById('editorTitle').textContent = item ? 'Edit note' : 'Add a note';
+  document.getElementById('edText').value = item ? item.text : '';
+  document.getElementById('edDetail').value = item ? item.detail : '';
+  document.getElementById('edSave').textContent = item ? 'Save note' : 'Add note';
+  document.getElementById('edDelete').hidden = !item;
+  paintEditorChoices();
+  document.getElementById('edErr').textContent = '';
+  busy = true;
+  editorEl.hidden = false;
+}
+function closeEditor() {
+  editorEl.hidden = true;
+  editingItem = null;
+  busy = false;
+}
+document.getElementById('addNoteBtn').addEventListener('click', function () { openEditor(null); });
+document.getElementById('edCancel').addEventListener('click', closeEditor);
+document.getElementById('edSave').addEventListener('click', function () {
+  var text = document.getElementById('edText').value.trim();
+  var detail = document.getElementById('edDetail').value.trim();
+  var edErr = document.getElementById('edErr');
+  if (!text && !edEmoji) {
+    edErr.textContent = 'Give the note some words or pick an emoji.';
+    return;
+  }
+  var done = function () { closeEditor(); load(); };
+  var fail = function () { edErr.textContent = 'Could not save that note — try again.' };
+  if (editingItem) {
+    api('PATCH', '/api/items', {
+      id: editingItem.id, text: text, emoji: edEmoji, column: edColumn, detail: detail
+    }).then(done).catch(fail);
+  } else {
+    api('POST', '/api/items', {
+      column: edColumn, text: text, emoji: edEmoji, detail: detail
+    }).then(done).catch(fail);
+  }
+});
+document.getElementById('edDelete').addEventListener('click', function () {
+  if (!editingItem) return;
+  var it = editingItem;
+  closeEditor();
+  remove(it);
+});
+
 /* ================= Actions ================= */
 
 function add(column, text) {
@@ -641,14 +1168,20 @@ STORES.forEach(function (store) {
   });
   storeButtons.appendChild(b);
 });
-document.getElementById('shopBtn').addEventListener('click', function () { picker.hidden = false; });
+document.getElementById('navList').addEventListener('click', function () { view = 'board'; render(); });
+document.getElementById('navFree').addEventListener('click', function () { view = 'free'; render(); });
+document.getElementById('navShop').addEventListener('click', function () {
+  if (view !== 'shop') shopReturn = view;
+  picker.hidden = false;
+});
 document.getElementById('pickerCancel').addEventListener('click', function () { picker.hidden = true; });
-document.getElementById('backBtn').addEventListener('click', function () { view = 'board'; render(); });
+document.getElementById('backBtn').addEventListener('click', function () { view = shopReturn; render(); });
 
 load();
-/* Keep the family in sync: refresh quietly in the background. */
-setInterval(function () { if (!document.hidden) load(); }, 20000);
-document.addEventListener('visibilitychange', function () { if (!document.hidden) load(); });
+/* Keep the family in sync: refresh quietly in the background —
+   but never mid-drag, mid-doodle, or while the editor is open. */
+setInterval(function () { if (!document.hidden && !busy) load(); }, 20000);
+document.addEventListener('visibilitychange', function () { if (!document.hidden && !busy) load(); });
 </script>
 </body>
 </html>
