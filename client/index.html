@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Kitchen Whiteboard</title>
+<title>Angeles Family Kitchen Whiteboard</title>
 <style>
   * { box-sizing: border-box; }
   html, body { margin: 0; padding: 0; }
@@ -90,6 +90,19 @@
     border: 1.5px solid #2456c8;
     border-radius: 20px;
     padding: 1px 8px;
+    margin-left: 6px;
+    vertical-align: middle;
+    white-space: nowrap;
+  }
+  .whotag {
+    display: inline-block;
+    font-family: -apple-system, "Segoe UI", Roboto, sans-serif;
+    font-size: .75rem;
+    font-weight: 700;
+    color: #fff;
+    background: #2456c8;
+    border-radius: 20px;
+    padding: 2px 9px;
     margin-left: 6px;
     vertical-align: middle;
     white-space: nowrap;
@@ -238,8 +251,64 @@
   .canvas svg#ink polyline { fill: none; stroke-linecap: round; stroke-linejoin: round; pointer-events: none; }
   .canvas.drawmode { touch-action: none; cursor: crosshair; }
   .canvas.drawmode .note { pointer-events: none; }
+  .canvas.drawmode .fphoto { pointer-events: none; }
   .canvas.erasemode { cursor: pointer; }
-  .canvas.erasemode svg#ink polyline { pointer-events: stroke; }
+
+  /* ---- Weather strip ---- */
+  .weatherstrip {
+    text-align: center;
+    font-family: -apple-system, "Segoe UI", Roboto, sans-serif;
+    color: #666;
+    font-size: .95rem;
+    margin-bottom: 12px;
+  }
+  .weatherstrip[hidden] { display: none; }
+
+  /* ---- Photos stuck on the board ---- */
+  .photoslot { position: absolute; top: 14px; width: 190px; z-index: 5; }
+  .photoslot.slot-left { left: 14px; transform: rotate(-3deg); }
+  .photoslot.slot-right { right: 14px; transform: rotate(2.5deg); }
+  .photoslot .ph, .fphoto {
+    position: relative;
+    background: #fff;
+    padding: 8px 8px 22px;
+    border: 1px solid #e2e2d8;
+    box-shadow: 0 6px 14px rgba(0,0,0,.3);
+  }
+  .photoslot img, .fphoto img { display: block; width: 100%; height: auto; }
+  .fphoto img { pointer-events: none; }
+  .magnet {
+    position: absolute; top: -13px; left: 50%; margin-left: -16px;
+    width: 32px; height: 32px; border-radius: 50%;
+    background: radial-gradient(circle at 35% 30%, #ff9a85, #c0392b 72%);
+    box-shadow: 0 3px 5px rgba(0,0,0,.35);
+    z-index: 2;
+  }
+  .photoslot.slot-right .magnet, .fphoto .magnet.blue {
+    background: radial-gradient(circle at 35% 30%, #8fb8ff, #2456c8 72%);
+  }
+  .fphoto .magnet.green { background: radial-gradient(circle at 35% 30%, #8fe0a0, #2e8b3a 72%); }
+  .fphoto .magnet.orange { background: radial-gradient(circle at 35% 30%, #ffc98a, #e67e22 72%); }
+  .pdel {
+    position: absolute; top: -10px; right: -10px;
+    width: 30px; height: 30px; border-radius: 50%;
+    border: none; background: #3a3a3a; color: #fff;
+    font-size: 1rem; line-height: 1; cursor: pointer; z-index: 3;
+    font-family: -apple-system, "Segoe UI", Roboto, sans-serif;
+  }
+  .photoslot .pempty {
+    border: 2.5px dashed #bbb; border-radius: 8px;
+    background: rgba(255,255,255,.65); color: #888;
+    font-family: -apple-system, "Segoe UI", Roboto, sans-serif;
+    font-size: .95rem;
+    display: flex; align-items: center; justify-content: center;
+    min-height: 128px; cursor: pointer; padding: 10px; text-align: center;
+  }
+  #funPhotos { position: absolute; left: 0; top: 0; width: 100%; height: 100%; pointer-events: none; }
+  .fphoto { position: absolute; width: 230px; cursor: grab; touch-action: none; pointer-events: auto; }
+  .note.fun { background: #ffe3f1; }
+  .note.announce { border: 3px solid #c0392b; }
+  .note.announce .ntext { font-size: 1.3rem; }
   #notes { position: absolute; left: 0; top: 0; width: 100%; height: 100%; }
   .note {
     position: absolute;
@@ -459,12 +528,14 @@
 </head>
 <body>
 <div class="board">
-  <h1>Kitchen Whiteboard</h1>
+  <h1>Angeles Family Kitchen Whiteboard</h1>
   <div class="sub">One board for the whole family. List it, slide it around on the Board, or take it Shopping.</div>
+  <div class="weatherstrip" id="weatherStrip" hidden></div>
 
   <div class="viewbar">
     <button type="button" id="navList">📋 List</button>
     <button type="button" id="navFree">🖍️ Board</button>
+    <button type="button" id="navFun">📣 Announcements</button>
     <button type="button" id="navShop" class="shop-nav">🛒 Shop</button>
   </div>
 
@@ -485,9 +556,32 @@
       <div class="canvas" id="canvas">
         <svg id="ink" width="1680" height="1100" viewBox="0 0 1680 1100" aria-hidden="true"></svg>
         <div id="notes"></div>
+        <div class="photoslot slot-left" id="photoSlot1"></div>
+        <div class="photoslot slot-right" id="photoSlot2"></div>
       </div>
     </div>
-    <div class="sub" style="margin-top:8px">Drag a note anywhere — drag its corner to stretch it. Tap a note to check it off. Pen draws, eraser rubs out one doodle at a tap.</div>
+    <div class="sub" style="margin-top:8px">Drag a note anywhere — drag its corner to stretch it. Tap a note to check it off. Pen draws, eraser rubs out one doodle at a tap. Photos stuck in the corners stay for 3 days.</div>
+  </div>
+
+  <div id="funView" hidden>
+    <div class="freetools">
+      <button type="button" class="tool add-note" id="addFunNoteBtn">＋ Add note</button>
+      <button type="button" class="tool" id="announceBtn">📣 Announce</button>
+      <button type="button" class="tool" id="addFunPhotoBtn">📷 Photo</button>
+      <button type="button" class="tool" id="funPenBtn">✏️ Pen</button>
+      <span class="swatches" id="funSwatches" hidden></span>
+      <button type="button" class="tool" id="funEraseBtn">🧽 Eraser</button>
+      <button type="button" class="tool" id="funUndoBtn">↩ Undo</button>
+      <button type="button" class="tool danger" id="funClearBtn">Clear drawings</button>
+    </div>
+    <div class="canvas-wrap">
+      <div class="canvas" id="funCanvas">
+        <svg id="funInk" width="1680" height="1100" viewBox="0 0 1680 1100" aria-hidden="true"></svg>
+        <div id="funPhotos"></div>
+        <div id="funNotes"></div>
+      </div>
+    </div>
+    <div class="sub" style="margin-top:8px">The fun board — announcement notes, doodles and photos. No groceries, no chores. Photos here stay 3 days too; notes and drawings stick around.</div>
   </div>
 
   <div id="shopView" hidden>
@@ -517,8 +611,14 @@
     <input type="text" id="edText" maxlength="120" placeholder="Milk, call grandma, anything…" autocomplete="off">
     <div class="lbl">Emoji (optional — a note can be just an emoji)</div>
     <div class="emoji-row" id="edEmojiRow"></div>
-    <div class="lbl">Which part of the board?</div>
-    <div class="col-chips" id="edCols"></div>
+    <div id="edColWrap">
+      <div class="lbl">Which part of the board?</div>
+      <div class="col-chips" id="edCols"></div>
+    </div>
+    <div id="edAssignWrap" hidden>
+      <div class="lbl">Who&rsquo;s on it?</div>
+      <div class="col-chips" id="edAssign"></div>
+    </div>
     <div class="lbl">Quantity or note (optional)</div>
     <input type="text" id="edDetail" maxlength="60" placeholder="e.g. 2, 18-count, gallon" autocomplete="off">
     <div class="editor-btns">
@@ -530,6 +630,8 @@
   </div>
 </div>
 
+<input type="file" id="photoFile" accept="image/*" hidden>
+
 <script>
 'use strict';
 
@@ -540,6 +642,9 @@ var COLUMNS = [
 ];
 
 var STORES = ['Grocery Outlet', 'WinCo', 'Albertsons', 'Any store'];
+
+/* Who a chore can be handed to — must match the server roster. */
+var PEOPLE = ['Ary', 'Tyson', 'Lily', 'Maria', 'Dad'];
 
 /* CLASSIFY-START — grocery section classifier (also exercised by tests).
    Standard store-flow order; sections checked in priority order so
@@ -618,8 +723,8 @@ function brandOptions(text) {
 }
 /* CLASSIFY-END */
 
-var state = { items: [], strokes: [] };
-var view = 'board';        // 'board' (list) | 'free' (canvas) | 'shop'
+var state = { items: [], strokes: [], photos: [] };
+var view = 'board';        // 'board' (list) | 'free' (kitchen canvas) | 'fun' | 'shop'
 var shopStore = 'Any store';
 var shopReturn = 'board';  // where Shop's back button returns to
 var busy = false;          // dragging / resizing / drawing / editor open
@@ -661,6 +766,7 @@ function load() {
   return api('GET', '/api/board').then(function (d) {
     state.items = d.items || [];
     state.strokes = d.strokes || [];
+    state.photos = d.photos || [];
     render();
     showErr('');
   }).catch(function () {
@@ -671,12 +777,15 @@ function load() {
 function render() {
   document.getElementById('boardView').hidden = view !== 'board';
   document.getElementById('freeView').hidden = view !== 'free';
+  document.getElementById('funView').hidden = view !== 'fun';
   document.getElementById('shopView').hidden = view !== 'shop';
   document.getElementById('navList').classList.toggle('active', view === 'board');
   document.getElementById('navFree').classList.toggle('active', view === 'free');
+  document.getElementById('navFun').classList.toggle('active', view === 'fun');
   document.getElementById('navShop').classList.toggle('active', view === 'shop');
   if (view === 'shop') renderShop();
-  else if (view === 'free') renderFree();
+  else if (view === 'free') renderCanvas(K);
+  else if (view === 'fun') renderCanvas(F);
   else renderBoard();
 }
 
@@ -712,13 +821,14 @@ function renderBoard() {
         '<span class="text">' + esc(it.text) +
           (it.detail ? ' <span class="detail">(' + esc(it.detail) + ')</span>' : '') +
           (it.brand ? '<span class="brandtag">' + esc(it.brand) + '</span>' : '') +
+          (it.column === 'chores' && it.assignee ? '<span class="whotag">' + esc(it.assignee) + '</span>' : '') +
         '</span>' +
-        '<button class="iconbtn edit" type="button" aria-label="Edit quantity or note">✎</button>' +
+        '<button class="iconbtn edit" type="button" aria-label="Edit item">✎</button>' +
         '<button class="iconbtn del" type="button" aria-label="Delete">&times;</button>';
       li.addEventListener('click', function () { toggle(it); });
       li.querySelector('.edit').addEventListener('click', function (e) {
         e.stopPropagation();
-        editDetail(it);
+        openEditor(it);
       });
       li.querySelector('.del').addEventListener('click', function (e) {
         e.stopPropagation();
@@ -813,12 +923,46 @@ function renderShop() {
   });
 }
 
-/* ================= Freeform board view ================= */
+/* ================= Freeform board views =================
+   Two canvases share this machinery: the kitchen Board (K) and
+   the Announcements fun board (F). Each context knows its own
+   elements; items and strokes carry which board they belong to
+   (column 'fun' / stroke.board 'fun'), so the two never mix. */
 
 var SVGNS = 'http://www.w3.org/2000/svg';
-var canvasEl = document.getElementById('canvas');
-var inkEl = document.getElementById('ink');
-var notesEl = document.getElementById('notes');
+
+var K = {
+  key: 'kitchen',
+  canvas: document.getElementById('canvas'),
+  ink: document.getElementById('ink'),
+  notes: document.getElementById('notes'),
+  penBtn: document.getElementById('penBtn'),
+  eraseBtn: document.getElementById('eraseBtn'),
+  swatches: document.getElementById('swatches'),
+  undoBtn: document.getElementById('undoStrokeBtn'),
+  clearBtn: document.getElementById('clearStrokesBtn')
+};
+var F = {
+  key: 'fun',
+  canvas: document.getElementById('funCanvas'),
+  ink: document.getElementById('funInk'),
+  notes: document.getElementById('funNotes'),
+  photos: document.getElementById('funPhotos'),
+  penBtn: document.getElementById('funPenBtn'),
+  eraseBtn: document.getElementById('funEraseBtn'),
+  swatches: document.getElementById('funSwatches'),
+  undoBtn: document.getElementById('funUndoBtn'),
+  clearBtn: document.getElementById('funClearBtn')
+};
+
+function ctxItems(ctx) {
+  return state.items.filter(function (it) {
+    return ctx.key === 'fun' ? it.column === 'fun' : it.column !== 'fun';
+  });
+}
+function ctxStrokes(ctx) {
+  return state.strokes.filter(function (s) { return (s.board || 'kitchen') === ctx.key; });
+}
 
 function clampNum(v, min, max) { return Math.max(min, Math.min(max, v)); }
 
@@ -828,33 +972,30 @@ function strokeEl(stroke) {
   pl.setAttribute('stroke', stroke.color);
   pl.setAttribute('stroke-width', '4');
   pl.dataset.id = stroke.id;
-  if (drawMode === 'erase') {
-    pl.addEventListener('pointerdown', function (e) {
-      e.stopPropagation();
-      deleteStroke(stroke.id);
-    });
-  }
   return pl;
 }
 
-function renderFree() {
-  canvasEl.classList.toggle('drawmode', drawMode !== 'off');
-  canvasEl.classList.toggle('erasemode', drawMode === 'erase');
-  document.getElementById('penBtn').classList.toggle('active', drawMode === 'pen');
-  document.getElementById('eraseBtn').classList.toggle('active', drawMode === 'erase');
-  document.getElementById('swatches').hidden = drawMode !== 'pen';
-  document.getElementById('undoStrokeBtn').disabled = !state.strokes.length;
+function renderCanvas(ctx) {
+  ctx.canvas.classList.toggle('drawmode', drawMode !== 'off');
+  ctx.canvas.classList.toggle('erasemode', drawMode === 'erase');
+  ctx.penBtn.classList.toggle('active', drawMode === 'pen');
+  ctx.eraseBtn.classList.toggle('active', drawMode === 'erase');
+  ctx.swatches.hidden = drawMode !== 'pen';
+  ctx.undoBtn.disabled = !ctxStrokes(ctx).length;
 
-  inkEl.innerHTML = '';
-  state.strokes.forEach(function (s) { inkEl.appendChild(strokeEl(s)); });
+  ctx.ink.innerHTML = '';
+  ctxStrokes(ctx).forEach(function (s) { ctx.ink.appendChild(strokeEl(s)); });
 
-  notesEl.innerHTML = '';
-  state.items.forEach(function (it) { notesEl.appendChild(noteEl(it)); });
+  ctx.notes.innerHTML = '';
+  ctxItems(ctx).forEach(function (it) { ctx.notes.appendChild(noteEl(it)); });
+
+  if (ctx.key === 'kitchen') renderSlots();
+  if (ctx.key === 'fun') renderFunPhotos();
 }
 
 function noteEl(it) {
   var el = document.createElement('div');
-  el.className = 'note ' + it.column + (it.done ? ' done' : '');
+  el.className = 'note ' + it.column + (it.done ? ' done' : '') + (it.emoji === '📣' ? ' announce' : '');
   el.style.left = it.x + 'px';
   el.style.top = it.y + 'px';
   el.style.width = it.w + 'px';
@@ -865,6 +1006,7 @@ function noteEl(it) {
     '<span class="ntext">' + esc(it.text) + '</span>' +
     (it.detail ? '<span class="ndetail">' + esc(it.detail) + '</span>' : '') +
     (it.brand ? '<span class="brandtag">' + esc(it.brand) + '</span>' : '') +
+    (it.column === 'chores' && it.assignee ? '<span class="whotag">' + esc(it.assignee) + '</span>' : '') +
     '<span class="nbtns">' +
       '<button type="button" class="nedit" aria-label="Edit note">✎</button>' +
       '<button type="button" class="ndel" aria-label="Delete note">&times;</button>' +
@@ -951,82 +1093,284 @@ function startResize(e, it, el) {
 
 /* ---- Sketching ---- */
 
-function canvasPoint(e) {
-  var r = canvasEl.getBoundingClientRect();
+/* ERASE-START — eraser hit-testing (also exercised by tests).
+   The eraser works by geometry: a tap lands on whatever covers
+   the canvas, so instead of asking the skinny SVG line to catch
+   the tap itself, find the stroke whose nearest segment passes
+   within maxDist px of the tap point and rub that one out. */
+function segDist(px, py, x1, y1, x2, y2) {
+  var dx = x2 - x1, dy = y2 - y1;
+  var len2 = dx * dx + dy * dy;
+  var t = len2 ? ((px - x1) * dx + (py - y1) * dy) / len2 : 0;
+  t = Math.max(0, Math.min(1, t));
+  var cx = x1 + t * dx, cy = y1 + t * dy;
+  return Math.sqrt((px - cx) * (px - cx) + (py - cy) * (py - cy));
+}
+
+function nearestStrokeId(strokes, x, y, maxDist) {
+  var best = null, bestD = maxDist;
+  strokes.forEach(function (s) {
+    for (var i = 0; i + 1 < s.points.length; i++) {
+      var d = segDist(x, y, s.points[i][0], s.points[i][1], s.points[i + 1][0], s.points[i + 1][1]);
+      if (d <= bestD) { bestD = d; best = s.id; }
+    }
+  });
+  return best;
+}
+/* ERASE-END */
+
+function canvasPoint(e, canvas) {
+  var r = canvas.getBoundingClientRect();
   return [Math.round((e.clientX - r.left) * 10) / 10, Math.round((e.clientY - r.top) * 10) / 10];
 }
 
-canvasEl.addEventListener('pointerdown', function (e) {
-  if (drawMode !== 'pen' || busy) return;
-  /* Only start a stroke on empty board, not on a note (notes have
-     pointer-events off in draw mode, so this is just belt & braces). */
-  if (e.target.closest && e.target.closest('.note')) return;
-  e.preventDefault();
-  busy = true;
-  var pts = [canvasPoint(e)];
-  var temp = document.createElementNS(SVGNS, 'polyline');
-  temp.setAttribute('stroke', penColor);
-  temp.setAttribute('stroke-width', '4');
-  temp.setAttribute('points', pts.map(function (p) { return p[0] + ',' + p[1]; }).join(' '));
-  inkEl.appendChild(temp);
-  canvasEl.setPointerCapture(e.pointerId);
-  canvasEl.onpointermove = function (ev) {
-    var p = canvasPoint(ev);
-    var last = pts[pts.length - 1];
-    if (Math.abs(p[0] - last[0]) + Math.abs(p[1] - last[1]) < 3) return;
-    pts.push(p);
-    temp.setAttribute('points', pts.map(function (q) { return q[0] + ',' + q[1]; }).join(' '));
-  };
-  canvasEl.onpointerup = canvasEl.onpointercancel = function () {
-    canvasEl.onpointermove = canvasEl.onpointerup = canvasEl.onpointercancel = null;
-    busy = false;
-    temp.remove();
-    if (pts.length >= 2) {
-      api('POST', '/api/strokes', { color: penColor, points: pts }).then(load).catch(function () {
-        showErr('Could not save that doodle — try again.');
-      });
+function attachCanvas(ctx) {
+  ctx.canvas.addEventListener('pointerdown', function (e) {
+    if (busy) return;
+    if (drawMode === 'erase') {
+      var p = canvasPoint(e, ctx.canvas);
+      var hit = nearestStrokeId(ctxStrokes(ctx), p[0], p[1], 22);
+      if (hit !== null) deleteStroke(hit);
+      return;
     }
-  };
-});
+    if (drawMode !== 'pen') return;
+    /* Only start a stroke on empty board, not on a note (notes have
+       pointer-events off in draw mode, so this is just belt & braces). */
+    if (e.target.closest && e.target.closest('.note')) return;
+    e.preventDefault();
+    busy = true;
+    var pts = [canvasPoint(e, ctx.canvas)];
+    var temp = document.createElementNS(SVGNS, 'polyline');
+    temp.setAttribute('stroke', penColor);
+    temp.setAttribute('stroke-width', '4');
+    temp.setAttribute('points', pts.map(function (q) { return q[0] + ',' + q[1]; }).join(' '));
+    ctx.ink.appendChild(temp);
+    ctx.canvas.setPointerCapture(e.pointerId);
+    ctx.canvas.onpointermove = function (ev) {
+      var p2 = canvasPoint(ev, ctx.canvas);
+      var last = pts[pts.length - 1];
+      if (Math.abs(p2[0] - last[0]) + Math.abs(p2[1] - last[1]) < 3) return;
+      pts.push(p2);
+      temp.setAttribute('points', pts.map(function (q) { return q[0] + ',' + q[1]; }).join(' '));
+    };
+    ctx.canvas.onpointerup = ctx.canvas.onpointercancel = function () {
+      ctx.canvas.onpointermove = ctx.canvas.onpointerup = ctx.canvas.onpointercancel = null;
+      busy = false;
+      temp.remove();
+      if (pts.length >= 2) {
+        api('POST', '/api/strokes', { color: penColor, points: pts, board: ctx.key }).then(load).catch(function () {
+          showErr('Could not save that doodle — try again.');
+        });
+      }
+    };
+  });
+}
+attachCanvas(K);
+attachCanvas(F);
 
 function setDrawMode(mode) {
   drawMode = drawMode === mode ? 'off' : mode;
   render();
 }
-document.getElementById('penBtn').addEventListener('click', function () { setDrawMode('pen'); });
-document.getElementById('eraseBtn').addEventListener('click', function () { setDrawMode('erase'); });
-document.getElementById('undoStrokeBtn').addEventListener('click', function () {
-  var last = state.strokes[state.strokes.length - 1];
-  if (last) deleteStroke(last.id);
-});
-document.getElementById('clearStrokesBtn').addEventListener('click', function () {
-  if (!state.strokes.length) return;
-  if (!window.confirm('Rub out ALL the drawings on the board? Notes stay.')) return;
-  api('POST', '/api/clear-strokes', {}).then(load).catch(function () {
-    showErr('Could not clear the drawings — try again.');
-  });
-});
 function deleteStroke(id) {
   api('DELETE', '/api/strokes?id=' + id).then(load).catch(function () {
     showErr('Could not erase that — try again.');
   });
 }
 
-/* Marker color swatches */
-var swatchesEl = document.getElementById('swatches');
-MARKERS.forEach(function (m) {
-  var b = document.createElement('button');
-  b.type = 'button';
-  b.className = 'swatch' + (penColor === m.color ? ' selected' : '');
-  b.style.background = m.color;
-  b.setAttribute('aria-label', m.name + ' marker');
-  b.addEventListener('click', function () {
-    penColor = m.color;
-    swatchesEl.querySelectorAll('.swatch').forEach(function (s) { s.classList.remove('selected'); });
-    b.classList.add('selected');
+/* Clear drawings asks on the button itself ("Tap again to clear!")
+   instead of window.confirm — dialogs get silently blocked in
+   some embedded browsers, which made the button look dead. */
+function armClear(btn, ctx) {
+  btn.addEventListener('click', function () {
+    if (!ctxStrokes(ctx).length) return;
+    if (btn.dataset.armed) {
+      btn.dataset.armed = '';
+      btn.textContent = 'Clear drawings';
+      api('POST', '/api/clear-strokes', { board: ctx.key }).then(load).catch(function () {
+        showErr('Could not clear the drawings — try again.');
+      });
+    } else {
+      btn.dataset.armed = '1';
+      btn.textContent = 'Tap again to clear!';
+      setTimeout(function () {
+        if (btn.dataset.armed) { btn.dataset.armed = ''; btn.textContent = 'Clear drawings'; }
+      }, 3000);
+    }
   });
-  swatchesEl.appendChild(b);
+}
+
+[K, F].forEach(function (ctx) {
+  ctx.penBtn.addEventListener('click', function () { setDrawMode('pen'); });
+  ctx.eraseBtn.addEventListener('click', function () { setDrawMode('erase'); });
+  ctx.undoBtn.addEventListener('click', function () {
+    var list = ctxStrokes(ctx);
+    var last = list[list.length - 1];
+    if (last) deleteStroke(last.id);
+  });
+  armClear(ctx.clearBtn, ctx);
+  buildSwatches(ctx.swatches);
 });
+
+/* Marker color swatches */
+function buildSwatches(container) {
+  MARKERS.forEach(function (m) {
+    var b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'swatch' + (penColor === m.color ? ' selected' : '');
+    b.style.background = m.color;
+    b.dataset.color = m.color;
+    b.setAttribute('aria-label', m.name + ' marker');
+    b.addEventListener('click', function () {
+      penColor = m.color;
+      document.querySelectorAll('.swatch').forEach(function (s) {
+        s.classList.toggle('selected', s.dataset.color === penColor);
+      });
+    });
+    container.appendChild(b);
+  });
+}
+
+/* ---- Photos ---- */
+
+var fileInput = document.getElementById('photoFile');
+var pendingPhotoSlot = null;   // 'slot1' | 'slot2' | 'fun'
+
+function pickPhoto(slot) {
+  pendingPhotoSlot = slot;
+  fileInput.value = '';
+  fileInput.click();
+}
+fileInput.addEventListener('change', function () {
+  var file = fileInput.files && fileInput.files[0];
+  if (!file || !pendingPhotoSlot) return;
+  var slot = pendingPhotoSlot;
+  pendingPhotoSlot = null;
+  downscalePhoto(file, function (b64) {
+    if (!b64) { showErr('Could not read that photo.'); return; }
+    api('POST', '/api/photos', { slot: slot, data: b64 }).then(load).catch(function () {
+      showErr('Could not post that photo — too big, not a photo, or the fun board is full.');
+    });
+  });
+});
+
+/* Shrink on the phone before uploading: max ~1200px on the long
+   edge, JPEG — keeps the board light and the upload quick. */
+function downscalePhoto(file, cb) {
+  var url = URL.createObjectURL(file);
+  var img = new Image();
+  img.onload = function () {
+    var scale = Math.min(1, 1200 / Math.max(img.width, img.height));
+    var c = document.createElement('canvas');
+    c.width = Math.max(1, Math.round(img.width * scale));
+    c.height = Math.max(1, Math.round(img.height * scale));
+    c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+    URL.revokeObjectURL(url);
+    var d = c.toDataURL('image/jpeg', 0.85);
+    cb(d.slice(d.indexOf(',') + 1));
+  };
+  img.onerror = function () { URL.revokeObjectURL(url); cb(null); };
+  img.src = url;
+}
+
+function removePhoto(id) {
+  api('DELETE', '/api/photos?id=' + id).then(load).catch(function () {
+    showErr('Could not take that photo down — try again.');
+  });
+}
+
+function photoImg(ph) {
+  var img = document.createElement('img');
+  img.alt = 'Family photo';
+  /* The version stamp is the upload time, so a replaced photo
+     never shows the browser's cached copy of the old one. */
+  img.src = '/photos/' + ph.file + '?v=' + ph.uploadedAt;
+  return img;
+}
+
+function renderSlots() {
+  [['photoSlot1', 'slot1'], ['photoSlot2', 'slot2']].forEach(function (pair) {
+    var el = document.getElementById(pair[0]);
+    var ph = state.photos.find(function (p) { return p.slot === pair[1]; });
+    el.innerHTML = '';
+    if (!ph) {
+      var empty = document.createElement('div');
+      empty.className = 'pempty';
+      empty.textContent = '📷 Add a photo';
+      empty.addEventListener('click', function () { pickPhoto(pair[1]); });
+      el.appendChild(empty);
+      return;
+    }
+    var wrap = document.createElement('div');
+    wrap.className = 'ph';
+    var del = document.createElement('button');
+    del.type = 'button';
+    del.className = 'pdel';
+    del.textContent = '×';
+    del.setAttribute('aria-label', 'Remove photo');
+    del.addEventListener('click', function (e) { e.stopPropagation(); removePhoto(ph.id); });
+    var mag = document.createElement('span');
+    mag.className = 'magnet';
+    wrap.appendChild(mag);
+    wrap.appendChild(photoImg(ph));
+    wrap.appendChild(del);
+    wrap.addEventListener('click', function () { pickPhoto(pair[1]); });
+    el.appendChild(wrap);
+  });
+}
+
+var MAGNET_CLASSES = ['', 'blue', 'green', 'orange'];
+function renderFunPhotos() {
+  var layer = F.photos;
+  layer.innerHTML = '';
+  state.photos.filter(function (p) { return p.slot === 'fun'; }).forEach(function (ph) {
+    var el = document.createElement('div');
+    el.className = 'fphoto';
+    el.style.left = ph.x + 'px';
+    el.style.top = ph.y + 'px';
+    el.style.transform = 'rotate(' + (ph.id % 2 ? -2.5 : 2) + 'deg)';
+    var mag = document.createElement('span');
+    mag.className = 'magnet ' + MAGNET_CLASSES[ph.id % MAGNET_CLASSES.length];
+    var del = document.createElement('button');
+    del.type = 'button';
+    del.className = 'pdel';
+    del.textContent = '×';
+    del.setAttribute('aria-label', 'Remove photo');
+    del.addEventListener('pointerdown', function (e) { e.stopPropagation(); });
+    del.addEventListener('click', function (e) { e.stopPropagation(); removePhoto(ph.id); });
+    el.appendChild(mag);
+    el.appendChild(photoImg(ph));
+    el.appendChild(del);
+    el.addEventListener('pointerdown', function (e) { startPhotoDrag(e, ph, el); });
+    layer.appendChild(el);
+  });
+}
+
+/* Fun photos drag around their canvas, like the notes do. */
+function startPhotoDrag(e, ph, el) {
+  if (drawMode !== 'off' || busy) return;
+  e.preventDefault();
+  busy = true;
+  var startX = e.clientX, startY = e.clientY;
+  var origX = ph.x, origY = ph.y;
+  el.setPointerCapture(e.pointerId);
+  el.onpointermove = function (ev) {
+    ph.x = clampNum(Math.round(origX + ev.clientX - startX), -60, BOARD_W - 60);
+    ph.y = clampNum(Math.round(origY + ev.clientY - startY), 0, BOARD_H - 40);
+    el.style.left = ph.x + 'px';
+    el.style.top = ph.y + 'px';
+  };
+  el.onpointerup = el.onpointercancel = function () {
+    el.onpointermove = el.onpointerup = el.onpointercancel = null;
+    busy = false;
+    api('PATCH', '/api/photos', { id: ph.id, x: ph.x, y: ph.y }).then(load).catch(function () {
+      showErr('Could not save that move — try again.');
+      load();
+    });
+  };
+}
+
+document.getElementById('addFunPhotoBtn').addEventListener('click', function () { pickPhoto('fun'); });
 
 /* ---- Note editor (add + edit) ---- */
 
@@ -1034,6 +1378,9 @@ var editorEl = document.getElementById('editor');
 var editingItem = null;   // null = adding a new note
 var edEmoji = '';
 var edColumn = 'groceries';
+var edAssignee = '';      // '' = unassigned (chores only)
+var editorBoard = 'kitchen';  // 'kitchen' | 'fun'
+var editorAnnounce = false;   // posting a megaphone note on the fun board
 
 var edEmojiRow = document.getElementById('edEmojiRow');
 EMOJIS.forEach(function (em) {
@@ -1059,6 +1406,18 @@ COLUMNS.forEach(function (col) {
   });
   edColsEl.appendChild(b);
 });
+var edAssignEl = document.getElementById('edAssign');
+[''].concat(PEOPLE).forEach(function (name) {
+  var b = document.createElement('button');
+  b.type = 'button';
+  b.textContent = name || 'Unassigned';
+  b.dataset.assignee = name;
+  b.addEventListener('click', function () {
+    edAssignee = name;
+    paintEditorChoices();
+  });
+  edAssignEl.appendChild(b);
+});
 function paintEditorChoices() {
   edEmojiRow.querySelectorAll('button').forEach(function (b) {
     b.classList.toggle('selected', b.dataset.emoji === edEmoji);
@@ -1066,16 +1425,29 @@ function paintEditorChoices() {
   edColsEl.querySelectorAll('button').forEach(function (b) {
     b.classList.toggle('selected', b.dataset.column === edColumn);
   });
+  /* The area + person pickers are kitchen business only — the fun
+     board has neither, and a person only makes sense on a chore. */
+  document.getElementById('edColWrap').hidden = editorBoard === 'fun';
+  document.getElementById('edAssignWrap').hidden = editorBoard === 'fun' || edColumn !== 'chores';
+  edAssignEl.querySelectorAll('button').forEach(function (b) {
+    b.classList.toggle('selected', b.dataset.assignee === edAssignee);
+  });
 }
 
-function openEditor(item) {
+function openEditor(item, opts) {
   editingItem = item || null;
-  edEmoji = item ? item.emoji : '';
-  edColumn = item ? item.column : 'groceries';
-  document.getElementById('editorTitle').textContent = item ? 'Edit note' : 'Add a note';
+  editorAnnounce = !!(opts && opts.announce);
+  editorBoard = opts && opts.board ? opts.board
+    : (item && item.column === 'fun' ? 'fun' : 'kitchen');
+  edEmoji = item ? item.emoji : (editorAnnounce ? '📣' : '');
+  edColumn = item && item.column !== 'fun' ? item.column : 'groceries';
+  edAssignee = item && item.assignee ? item.assignee : '';
+  document.getElementById('editorTitle').textContent = item ? 'Edit note'
+    : (editorAnnounce ? 'Post an announcement' : 'Add a note');
   document.getElementById('edText').value = item ? item.text : '';
   document.getElementById('edDetail').value = item ? item.detail : '';
-  document.getElementById('edSave').textContent = item ? 'Save note' : 'Add note';
+  document.getElementById('edSave').textContent = item ? 'Save note'
+    : (editorAnnounce ? 'Post it' : 'Add note');
   document.getElementById('edDelete').hidden = !item;
   paintEditorChoices();
   document.getElementById('edErr').textContent = '';
@@ -1099,14 +1471,21 @@ document.getElementById('edSave').addEventListener('click', function () {
   }
   var done = function () { closeEditor(); load(); };
   var fail = function () { edErr.textContent = 'Could not save that note — try again.' };
+  var column = editorBoard === 'fun' ? 'fun' : edColumn;
+  var who = column === 'chores' ? (edAssignee || null) : null;
   if (editingItem) {
     api('PATCH', '/api/items', {
-      id: editingItem.id, text: text, emoji: edEmoji, column: edColumn, detail: detail
+      id: editingItem.id, text: text, emoji: edEmoji, column: column, detail: detail, assignee: who
     }).then(done).catch(fail);
   } else {
-    api('POST', '/api/items', {
-      column: edColumn, text: text, emoji: edEmoji, detail: detail
-    }).then(done).catch(fail);
+    var payload = {
+      column: column, text: text, emoji: edEmoji, detail: detail, assignee: who
+    };
+    if (editorAnnounce) {
+      /* Announcements land big and front-and-center on the fun board. */
+      payload.x = 640; payload.y = 80; payload.w = 380; payload.h = 150;
+    }
+    api('POST', '/api/items', payload).then(done).catch(fail);
   }
 });
 document.getElementById('edDelete').addEventListener('click', function () {
@@ -1138,13 +1517,6 @@ function clearChecked(column) {
     showErr('Could not clear — try again.');
   });
 }
-function editDetail(item) {
-  var value = window.prompt('Quantity or note for "' + item.text + '" (e.g. 2, 18-count, gallon). Leave empty to clear.', item.detail || '');
-  if (value === null) return;
-  api('PATCH', '/api/items', { id: item.id, detail: value.trim() }).then(load).catch(function () {
-    showErr('Could not save that — try again.');
-  });
-}
 function setBrand(item, brand) {
   api('PATCH', '/api/items', { id: item.id, brand: brand }).then(load).catch(function () {
     showErr('Could not save that brand — try again.');
@@ -1170,6 +1542,9 @@ STORES.forEach(function (store) {
 });
 document.getElementById('navList').addEventListener('click', function () { view = 'board'; render(); });
 document.getElementById('navFree').addEventListener('click', function () { view = 'free'; render(); });
+document.getElementById('navFun').addEventListener('click', function () { view = 'fun'; render(); });
+document.getElementById('addFunNoteBtn').addEventListener('click', function () { openEditor(null, { board: 'fun' }); });
+document.getElementById('announceBtn').addEventListener('click', function () { openEditor(null, { board: 'fun', announce: true }); });
 document.getElementById('navShop').addEventListener('click', function () {
   if (view !== 'shop') shopReturn = view;
   picker.hidden = false;
@@ -1177,7 +1552,29 @@ document.getElementById('navShop').addEventListener('click', function () {
 document.getElementById('pickerCancel').addEventListener('click', function () { picker.hidden = true; });
 document.getElementById('backBtn').addEventListener('click', function () { view = shopReturn; render(); });
 
+/* ================= Weather (Taft, CA) =================
+   The server fetches and caches Open-Meteo; if it can't, the
+   strip simply never appears — weather never breaks the board. */
+
+function loadWeather() {
+  fetch('/api/weather').then(function (r) {
+    if (!r.ok) throw new Error('no weather');
+    return r.json();
+  }).then(function (d) {
+    if (!d.days || !d.days.length) return;
+    var parts = d.days.map(function (day, i) {
+      var when = i === 0 ? 'Today'
+        : new Date(day.date + 'T12:00:00').toLocaleDateString('en-US', { weekday: 'short' });
+      return when + ' ' + day.emoji + ' ' + day.label + ' ' + day.hi + '°/' + day.lo + '°';
+    });
+    var el = document.getElementById('weatherStrip');
+    el.textContent = 'Taft, CA — ' + parts.join('  ·  ');
+    el.hidden = false;
+  }).catch(function () { /* no weather, no problem */ });
+}
+
 load();
+loadWeather();
 /* Keep the family in sync: refresh quietly in the background —
    but never mid-drag, mid-doodle, or while the editor is open. */
 setInterval(function () { if (!document.hidden && !busy) load(); }, 20000);
